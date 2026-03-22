@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,915 +10,264 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:       #0f0d0b;
-      --surface:  #141210;
-      --surface2: rgba(255,255,255,0.025);
-      --border:   rgba(255,255,255,0.065);
-      --text:     #f0ede8;
-      --muted:    #8a8580;
-      --dim:      #6b6660;
-      --gold:     #e8c547;
-      --cyan:     #38c9f2;
-      --purple:   #9b6dff;
-      --red:      #f87171;
-      --green:    #4ade80;
-      --orange:   #f28c38;
+      --bg: #0f0d0b; --surface: #141210; --surface2: rgba(255,255,255,0.025);
+      --border: rgba(255,255,255,0.065); --text: #f0ede8; --muted: #8a8580;
+      --dim: #6b6660; --gold: #e8c547; --cyan: #38c9f2; --purple: #9b6dff;
+      --red: #f87171; --green: #4ade80;
     }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
+    
+    /* Sidebar */
+    .sidebar { position: fixed; width: 220px; height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; z-index: 100; }
+    .sidebar-logo { padding: 0 24px 32px; }
+    .sidebar-logo h1 { font-family: 'Syne'; font-size: 22px; line-height: 1.1; }
+    .sidebar-nav { flex: 1; padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; font-size: 13px; color: var(--dim); text-decoration: none; border: none; background: none; width: 100%; cursor: pointer; transition: 0.2s; text-align: left; }
+    .nav-item:hover, .nav-item.active { color: var(--gold); background: rgba(232,197,71,0.08); }
 
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: #2e2b25; border-radius: 4px; }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      position: fixed;
-      top: 0; left: 0;
-      width: 220px;
-      height: 100vh;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 32px 0;
-      z-index: 100;
-      overflow-y: auto;
-    }
-
-    .sidebar-logo {
-      padding: 0 24px 32px;
-    }
-    .sidebar-logo .eyebrow {
-      font-size: 9px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--gold);
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .sidebar-logo h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--text);
-      line-height: 1.1;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: 0 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--dim);
-      cursor: pointer;
-      text-decoration: none;
-      transition: color 0.18s, background 0.18s;
-      border: none;
-      background: none;
-      width: 100%;
-      text-align: left;
-    }
-    .nav-item:hover { color: var(--gold); background: rgba(232,197,71,0.05); }
-    .nav-item.active { color: var(--gold); background: rgba(232,197,71,0.09); }
-    .nav-item .nav-icon { font-size: 16px; flex-shrink: 0; }
-
-    /* ── Availability pill ── */
-    .avail-pill {
-      margin: 0 16px;
-      padding: 16px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-    }
-    .avail-pill .label {
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-    .avail-pill .row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 12px;
-    }
-    .avail-pill .row .pct { font-weight: 700; color: var(--green); }
-    .avail-pill .bar-bg {
-      background: #1e1c18;
-      border-radius: 4px;
-      height: 5px;
-      overflow: hidden;
-    }
-    .avail-pill .bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--green), #86efac);
-      border-radius: 4px;
-      transition: width 1.2s cubic-bezier(.4,0,.2,1);
-    }
-    .avail-pill .sub-row {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 11px;
-      color: var(--dim);
-    }
-
-    /* ── Main ── */
-    .main {
-      margin-left: 220px;
-      padding: 36px 40px;
-      flex: 1;
-      min-height: 100vh;
-    }
-
-    /* ── Header ── */
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 36px;
-    }
-    .page-header .date {
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .page-header h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: 34px;
-      font-weight: 800;
-      line-height: 1;
-    }
-    .header-badges { display: flex; gap: 8px; align-items: center; }
-    .badge-overdue {
-      background: rgba(239,68,68,.12);
-      border: 1px solid rgba(239,68,68,.3);
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 12px;
-      color: var(--red);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .badge-overdue .dot {
-      width: 7px; height: 7px;
-      background: #ef4444;
-      border-radius: 50%;
-      animation: pulse 1.5s infinite;
-    }
-    .badge-user {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 6px 16px;
-      font-size: 12px;
-      color: var(--muted);
-      text-decoration: none;
-    }
-    .badge-user:hover { color: var(--text); }
-
-    /* ── Tab panels ── */
-    .tab-panel { display: none; }
+    /* Main Content */
+    .main { margin-left: 220px; padding: 40px; width: calc(100% - 220px); }
+    .tab-panel { display: none; animation: fadeIn 0.4s ease forwards; }
     .tab-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ── Stat grid ── */
-    .stat-grid {
-      display: grid;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-    .stat-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
-    .stat-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    /* Stat Cards */
+    .stat-grid { display: grid; gap: 20px; grid-template-columns: repeat(4, 1fr); margin-bottom: 30px; }
+    .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 30px; position: relative; overflow: hidden; }
+    .stat-card .accent-bar { position: absolute; top: 0; left: 0; width: 100%; height: 3px; }
+    .stat-card h3 { font-family: 'Syne'; font-size: 48px; margin-bottom: 5px; }
+    .stat-card p { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; color: var(--muted); }
 
-    .stat-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px 28px;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.2s, box-shadow 0.2s;
-      cursor: default;
-    }
-    .stat-card:hover { transform: translateY(-3px); }
-    .stat-card .accent-bar {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 3px;
-      border-radius: 16px 16px 0 0;
-    }
-    .stat-card .card-icon { font-size: 26px; margin-bottom: 6px; }
-    .stat-card .card-value {
-      font-family: 'Syne', sans-serif;
-      font-size: 38px;
-      font-weight: 800;
-      line-height: 1;
-    }
-    .stat-card .card-label {
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-top: 6px;
-    }
-    .stat-card .card-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    /* Book Gallery Styling */
+    .book-card { transition: all 0.3s ease; cursor: pointer; }
+    .book-card:hover { transform: translateY(-8px); }
+    .book-card:hover .cover-wrapper { border-color: var(--gold); box-shadow: 0 12px 24px rgba(0,0,0,0.5); }
+    .cover-wrapper { width: 100%; aspect-ratio: 2/3; background: var(--surface2); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 12px; transition: 0.3s; position: relative; }
 
-    /* ── Chart row ── */
-    .chart-row {
-      display: grid;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    .chart-row.split-lg { grid-template-columns: 1fr 340px; }
-    .chart-row.split-eq { grid-template-columns: 1fr 320px; }
-
-    .chart-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-    }
-
-    /* ── Section title ── */
-    .section-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-    .section-title .bar {
-      width: 3px; height: 18px;
-      background: var(--gold);
-      border-radius: 2px;
-    }
-    .section-title span {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #b0aa9e;
-      font-weight: 700;
-    }
-
-    /* ── Chart legend ── */
-    .chart-legend {
-      display: flex;
-      gap: 20px;
-      margin-top: 12px;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .legend-dot { width: 20px; height: 2px; border-radius: 2px; }
-
-    /* ── Genre list inside donut card ── */
-    .genre-list {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      margin-top: 10px;
-    }
-    .genre-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .genre-row .left { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #b0aa9e; }
-    .genre-row .dot-sq { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
-    .genre-row .right { font-size: 12px; color: var(--dim); }
-
-    /* ── Table ── */
+    /* Table & UI Design */
+    .search-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); padding: 14px 20px; border-radius: 12px; color: white; margin-bottom: 20px; outline: none; transition: 0.3s; }
+    .search-input:focus { border-color: var(--gold); }
     .data-table { width: 100%; border-collapse: collapse; }
-    .data-table thead th {
-      text-align: left;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--dim);
-      padding-bottom: 13px;
-      font-weight: 600;
-    }
-    .data-table tbody tr { border-top: 1px solid rgba(255,255,255,0.04); }
-    .data-table tbody td { padding: 12px 0; font-size: 13px; }
-    .data-table tbody td.muted { color: var(--muted); }
-    .data-table tbody td.name { color: #d0cdc7; font-weight: 500; }
-    .data-table tbody td.trunc {
-      max-width: 180px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      color: var(--muted);
-      padding-right: 14px;
-    }
+    .data-table th { text-align: left; font-size: 11px; color: var(--dim); text-transform: uppercase; padding: 15px 0; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 14px; }
+    .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .status-pill.active { background: rgba(74,222,128,0.1); color: var(--green); }
+    .status-pill.overdue { background: rgba(248,113,113,0.1); color: var(--red); }
+    .status-pill.returned { background: rgba(255,255,255,0.05); color: var(--muted); }
 
-    /* ── Status badge ── */
-    .status-badge {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 3px 10px;
-      border-radius: 20px;
-    }
-    .status-badge.overdue {
-      background: rgba(239,68,68,.12);
-      color: var(--red);
-      border: 1px solid rgba(239,68,68,.25);
-    }
-    .status-badge.active {
-      background: rgba(74,222,128,.10);
-      color: var(--green);
-      border: 1px solid rgba(74,222,128,.2);
-    }
-    .status-badge.returned {
-      background: rgba(148,163,184,.10);
-      color: #94a3b8;
-      border: 1px solid rgba(148,163,184,.2);
-    }
-
-    /* ── Condition summary box ── */
-    .condition-summary {
-      margin-top: 16px;
-      padding: 14px;
-      background: rgba(255,255,255,0.02);
-      border-radius: 10px;
-    }
-    .condition-summary .cs-label {
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 8px;
-    }
-    .condition-summary .cs-value {
-      font-family: 'Syne', sans-serif;
-      font-size: 30px;
-      font-weight: 800;
-    }
-    .condition-summary .cs-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-    /* ── Member cards ── */
-    .member-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 4px;
-    }
-    .member-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: border-color 0.2s;
-    }
-    .member-card:hover { border-color: rgba(255,255,255,0.12); }
-    .member-avatar {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      flex-shrink: 0;
-    }
-    .member-info { min-width: 0; flex: 1; }
-    .member-info .uname {
-      font-size: 13px;
-      font-weight: 600;
-      color: #d0cdc7;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .member-info .ubook {
-      font-size: 11px;
-      color: var(--dim);
-      margin-top: 2px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    /* ── Animations ── */
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.35; }
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .tab-panel.active { animation: fadeUp 0.3s ease; }
-
-    /* ── Responsive ── */
-    @media (max-width: 1100px) {
-      .chart-row.split-lg,
-      .chart-row.split-eq { grid-template-columns: 1fr; }
-      .stat-grid.cols-4    { grid-template-columns: repeat(2, 1fr); }
-      .member-grid         { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 700px) {
-      .sidebar { width: 0; overflow: hidden; }
-      .main    { margin-left: 0; padding: 24px 18px; }
-      .stat-grid.cols-4,
-      .stat-grid.cols-3    { grid-template-columns: 1fr 1fr; }
-      .member-grid         { grid-template-columns: 1fr; }
-    }
+    /* Members & Modal */
+    .members-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    .member-item-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 15px; }
+    .avatar-circle { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-content { background: var(--surface); border: 1px solid var(--border); width: 90%; max-width: 500px; padding: 32px; border-radius: 24px; position: relative; }
   </style>
 </head>
 <body>
 
-<!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+<div id="historyModal" class="modal-overlay">
+  <div class="modal-content">
+    <button onclick="document.getElementById('historyModal').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; color:var(--dim); cursor:pointer; font-size: 20px;">✕</button>
+    <h3 id="modalUser" style="font-family:'Syne'; font-size: 24px; margin-bottom:5px; color: var(--gold);">Member History</h3>
+    <p id="modalUserSub" style="font-size: 12px; color: var(--dim); margin-bottom: 25px;">Past and current book records</p>
+    <div id="historyList" style="max-height:350px; overflow-y:auto; padding-right: 10px;"></div>
+  </div>
+</div>
+
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="eyebrow">Library</div>
-    <h1>Shelf<br>Master</h1>
+    <div style="font-size: 9px; color: var(--gold); text-transform: uppercase; font-weight: 700; margin-bottom: 5px;">Library Admin</div>
+    <h1>Shelf Master</h1>
   </div>
-
   <nav class="sidebar-nav">
-    <button class="nav-item active" data-tab="overview">
-      <span class="nav-icon">◈</span> Overview
-    </button>
-    <button class="nav-item" data-tab="books">
-      <span class="nav-icon">◫</span> Books
-    </button>
-    <button class="nav-item" data-tab="borrowings">
-      <span class="nav-icon">⇄</span> Borrowings
-    </button>
-    <button class="nav-item" data-tab="members">
-      <span class="nav-icon">◎</span> Members
-    </button>
+    <button class="nav-item active" data-tab="overview">◈ Overview</button>
+    <button class="nav-item" data-tab="books">◫ Books</button>
+    <button class="nav-item" data-tab="borrowings">⇄ Borrowings</button>
+    <button class="nav-item" data-tab="members">◎ Members</button>
   </nav>
-
-  <div class="avail-pill">
-    <div class="label">Collection Health</div>
-    <div class="row">
-      <span style="color:var(--muted)">Available</span>
-      <span class="pct">{{ avail_pct }}%</span>
-    </div>
-    <div class="bar-bg">
-      <div class="bar-fill" style="width: {{ avail_pct }}%"></div>
-    </div>
-    <div class="sub-row">
-      <span>{{ available_copies }} free</span>
-      <span>{{ total_copies }} total</span>
-    </div>
-  </div>
 </aside>
 
-<!-- ── Main ────────────────────────────────────────────────────────────── -->
 <main class="main">
+  <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+    <h2 id="page-title" style="font-family: 'Syne'; font-size: 42px;">Overview</h2>
+    <div style="background: rgba(239,68,68,0.1); color: var(--red); padding: 8px 16px; border-radius: 30px; font-size: 12px;">{{ overdue_borrowings }} Overdue Notifications</div>
+  </div>
 
-  <!-- Header -->
-  <div class="page-header">
-    <div>
-      <div class="date" id="js-date">—</div>
-      <h2 id="page-title">Dashboard</h2>
+  <div id="tab-overview" class="tab-panel active">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="accent-bar" style="background:var(--gold)"></div><h3 style="color:var(--gold)">{{ total_books }}</h3><p>Total Books</p></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--cyan)"></div><h3 style="color:var(--cyan)">{{ active_borrowings }}</h3><p>Active Loans</p></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--purple)"></div><h3 style="color:var(--purple)">{{ total_members }}</h3><p>Members</p></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--red)"></div><h3 style="color:var(--red)">{{ overdue_borrowings }}</h3><p>Overdue</p></div>
     </div>
-    <div class="header-badges">
-      {% if overdue_borrowings %}
-      <div class="badge-overdue">
-        <span class="dot"></span>
-        {{ overdue_borrowings }} Overdue
-      </div>
-      {% endif %}
-      <a class="badge-user" href="{% url 'logout' %}">
-        {{ request.user.username }} · Logout
-      </a>
+    <div style="background: var(--surface2); padding: 30px; border-radius: 20px; border: 1px solid var(--border);">
+        <canvas id="trendChart" height="110"></canvas>
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════ OVERVIEW ════ -->
-  <div id="tab-overview" class="tab-panel active">
-
-    <!-- Stats -->
-    <div class="stat-grid cols-4">
-      <div class="stat-card" style="--hover-shadow: rgba(232,197,71,.2)">
-        <div class="accent-bar" style="background: var(--gold)"></div>
-        <div class="card-icon">📚</div>
-        <div class="card-value" style="color:var(--text)">{{ total_books }}</div>
-        <div class="card-label" style="color:var(--gold)">Total Books</div>
-        <div class="card-sub">{{ total_authors }} authors</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background: var(--cyan)"></div>
-        <div class="card-icon">⇄</div>
-        <div class="card-value" style="color:var(--text)">{{ active_borrowings }}</div>
-        <div class="card-label" style="color:var(--cyan)">Active Borrowings</div>
-        <div class="card-sub">across all members</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background: var(--purple)"></div>
-        <div class="card-icon">◎</div>
-        <div class="card-value" style="color:var(--text)">{{ total_members }}</div>
-        <div class="card-label" style="color:var(--purple)">Registered Members</div>
-        <div class="card-sub">borrower accounts</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background: var(--red)"></div>
-        <div class="card-icon">⚠</div>
-        <div class="card-value" style="color:var(--text)">{{ overdue_borrowings }}</div>
-        <div class="card-label" style="color:var(--red)">Overdue Returns</div>
-        <div class="card-sub">need attention</div>
-      </div>
-    </div>
-
-    <!-- Borrow trend + Genre donut -->
-    <div class="chart-row split-lg">
-      <div class="chart-card">
-        <div class="section-title"><div class="bar"></div><span>Borrowing Activity — Last 6 Months</span></div>
-        <canvas id="trendChart" height="100"></canvas>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Borrowed</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div> Returned</div>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="section-title"><div class="bar"></div><span>Books by Genre</span></div>
-        <canvas id="donutChart" height="180"></canvas>
-        <div class="genre-list" id="genre-legend"></div>
-      </div>
-    </div>
-
-    <!-- Recent borrowings + Condition -->
-    <div class="chart-row split-eq">
-      <div class="chart-card">
-        <div class="section-title"><div class="bar"></div><span>Recent Borrowings</span></div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Member</th><th>Book</th><th>Due Date</th><th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for b in borrowings_data %}
-            <tr>
-              <td class="name">{{ b.user }}</td>
-              <td class="trunc">{{ b.book }}</td>
-              <td class="muted">{{ b.due_date }}</td>
-              <td><span class="status-badge {{ b.status }}">{{ b.status }}</span></td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="4" class="muted" style="padding:20px 0;text-align:center">No borrowings yet.</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="chart-card">
-        <div class="section-title"><div class="bar"></div><span>Copy Condition</span></div>
-        <canvas id="conditionChart" height="200"></canvas>
-        <div class="condition-summary">
-          <div class="cs-label">Total Instances</div>
-          <div class="cs-value">{{ total_copies }}</div>
-          <div class="cs-sub">across {{ total_books }} titles</div>
-        </div>
-      </div>
-    </div>
-  </div><!-- /overview -->
-
-  <!-- ════════════════════════════════════════ BOOKS ════════ -->
   <div id="tab-books" class="tab-panel">
-    <div class="stat-grid cols-3">
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--gold)"></div>
-        <div class="card-icon">📖</div>
-        <div class="card-value" style="color:var(--text)">{{ total_books }}</div>
-        <div class="card-label" style="color:var(--gold)">Total Titles</div>
-        <div class="card-sub">unique books</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--purple)"></div>
-        <div class="card-icon">🏷</div>
-        <div class="card-value" style="color:var(--text)">{{ total_genres }}</div>
-        <div class="card-label" style="color:var(--purple)">Total Genres</div>
-        <div class="card-sub">categories</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--cyan)"></div>
-        <div class="card-icon">✍</div>
-        <div class="card-value" style="color:var(--text)">{{ total_authors }}</div>
-        <div class="card-label" style="color:var(--cyan)">Total Authors</div>
-        <div class="card-sub">registered</div>
-      </div>
+    <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 30px;">
+        <div class="stat-card"><div class="accent-bar" style="background:var(--gold)"></div><h3>{{ total_books }}</h3><p style="color:var(--gold)">Titles</p></div>
+        <div class="stat-card"><div class="accent-bar" style="background:var(--purple)"></div><h3>{{ total_genres }}</h3><p style="color:var(--purple)">Genres</p></div>
+        <div class="stat-card"><div class="accent-bar" style="background:var(--cyan)"></div><h3>{{ total_authors }}</h3><p style="color:var(--cyan)">Authors</p></div>
     </div>
-    <div class="chart-card">
-      <div class="section-title"><div class="bar"></div><span>Genre Distribution</span></div>
-      <canvas id="genreBarChart" height="90"></canvas>
-    </div>
-  </div><!-- /books -->
 
-  <!-- ════════════════════════════════════════ BORROWINGS ══ -->
+    <div style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <h4 style="font-family: 'Syne'; font-size: 20px; color: var(--text);">Digital Library Collection</h4>
+        <a href="{% url 'book:book-list' %}" style="color: var(--gold); font-size: 12px; text-decoration: none;">Management Table →</a>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 30px; margin-bottom: 50px;">
+        {% for book in all_books %}
+        <div class="book-card">
+            <div class="cover-wrapper">
+                {% if book.cover_image %}
+                    <img src="{{ book.cover_image.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                    <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 11px;">NO COVER</div>
+                {% endif %}
+            </div>
+            <h5 style="font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">{{ book.title }}</h5>
+            <p style="font-size: 12px; color: var(--dim);">{{ book.authors.all.0 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="background: var(--surface2); padding: 30px; border-radius: 24px; border: 1px solid var(--border);">
+        <h4 style="font-size: 10px; color: var(--dim); text-transform: uppercase; margin-bottom: 20px;">Category Breakdown</h4>
+        <canvas id="genreBarChart" height="100"></canvas>
+    </div>
+  </div>
+
   <div id="tab-borrowings" class="tab-panel">
-    <div class="stat-grid cols-4">
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--cyan)"></div>
-        <div class="card-icon">⇄</div>
-        <div class="card-value" style="color:var(--text)">{{ active_borrowings }}</div>
-        <div class="card-label" style="color:var(--cyan)">Active</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--red)"></div>
-        <div class="card-icon">⚠</div>
-        <div class="card-value" style="color:var(--text)">{{ overdue_borrowings }}</div>
-        <div class="card-label" style="color:var(--red)">Overdue</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--green)"></div>
-        <div class="card-icon">✓</div>
-        <div class="card-value" style="color:var(--text)">{{ total_members }}</div>
-        <div class="card-label" style="color:var(--green)">Members</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--gold)"></div>
-        <div class="card-icon">◈</div>
-        <div class="card-value" style="color:var(--text)">{{ total_copies }}</div>
-        <div class="card-label" style="color:var(--gold)">Total Copies</div>
-      </div>
+    <div class="search-container">
+        <input type="text" id="borrowSearch" class="search-input" placeholder="Search by member name or book title...">
     </div>
-
-    <div class="chart-card">
-      <div class="section-title"><div class="bar"></div><span>All Recent Borrowings</span></div>
-      <table class="data-table">
+    <div style="background: var(--surface2); padding: 30px; border-radius: 20px; border: 1px solid var(--border);">
+      <table class="data-table" id="borrowTable">
         <thead>
-          <tr>
-            <th>#</th><th>Member</th><th>Book Title</th>
-            <th>Borrowed</th><th>Due Date</th><th>Status</th>
-          </tr>
+          <tr><th>Member</th><th>Book Title</th><th>Borrowed</th><th>Due Date</th><th>Status</th></tr>
         </thead>
         <tbody>
           {% for b in borrowings_data %}
           <tr>
-            <td class="muted">#{{ b.id|stringformat:"04d" }}</td>
-            <td class="name" style="padding-right:12px">{{ b.user }}</td>
-            <td class="trunc">{{ b.book }}</td>
-            <td class="muted">{{ b.borrow_date }}</td>
-            <td class="muted" {% if b.status == 'overdue' %}style="color:var(--red)"{% endif %}>{{ b.due_date }}</td>
-            <td><span class="status-badge {{ b.status }}">{{ b.status }}</span></td>
+            <td style="font-weight:700;"># {{ b.user }}</td>
+            <td>{{ b.book }}</td>
+            <td style="color:var(--dim)">{{ b.borrow_date }}</td>
+            <td style="color:var(--dim)">{{ b.due_date }}</td>
+            <td><span class="status-pill {{ b.status }}">{{ b.status }}</span></td>
           </tr>
-          {% empty %}
-          <tr><td colspan="6" class="muted" style="padding:20px 0;text-align:center">No borrowings yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-  </div><!-- /borrowings -->
+  </div>
 
-  <!-- ════════════════════════════════════════ MEMBERS ═════ -->
   <div id="tab-members" class="tab-panel">
-    <div class="stat-grid cols-3">
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--purple)"></div>
-        <div class="card-icon">◎</div>
-        <div class="card-value" style="color:var(--text)">{{ total_members }}</div>
-        <div class="card-label" style="color:var(--purple)">Registered Members</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--cyan)"></div>
-        <div class="card-icon">⇄</div>
-        <div class="card-value" style="color:var(--text)">{{ active_borrowings }}</div>
-        <div class="card-label" style="color:var(--cyan)">Currently Borrowing</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-bar" style="background:var(--red)"></div>
-        <div class="card-icon">⚠</div>
-        <div class="card-value" style="color:var(--text)">{{ overdue_borrowings }}</div>
-        <div class="card-label" style="color:var(--red)">Members w/ Overdue</div>
-      </div>
+    <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 25px;">
+        <div class="stat-card"><div class="accent-bar" style="background:var(--purple)"></div><h3>{{ total_members }}</h3><p>Total Registered</p></div>
+        <div class="stat-card"><div class="accent-bar" style="background:var(--cyan)"></div><h3>{{ active_borrowings }}</h3><p>Active Borrowers</p></div>
+        <div class="stat-card"><div class="accent-bar" style="background:var(--red)"></div><h3>{{ overdue_borrowings }}</h3><p>Members w/ Overdue</p></div>
     </div>
-
-    <div class="chart-card">
-      <div class="section-title"><div class="bar"></div><span>Active Borrowers</span></div>
-      <div class="member-grid">
+    <div class="members-list-grid">
         {% for b in borrowings_data %}
-        {% if b.status == 'active' or b.status == 'overdue' %}
-        <div class="member-card">
-          <div class="member-avatar" style="background: hsl({{ forloop.counter0|add:'1' }}00, 45%, 28%)">
-            {{ b.user|first|upper }}
-          </div>
-          <div class="member-info">
-            <div class="uname">{{ b.user }}</div>
-            <div class="ubook">{{ b.book }}</div>
-          </div>
-          <span class="status-badge {{ b.status }}" style="flex-shrink:0">{{ b.status }}</span>
+        {% if b.status != 'returned' %}
+        <div class="member-item-card">
+            <div class="avatar-circle" style="background: rgba(155, 109, 255, 0.1); color: var(--purple);">{{ b.user|slice:":1"|upper }}</div>
+            <div class="member-info" style="flex: 1;">
+                <h4 style="font-size: 15px;">{{ b.user }}</h4>
+                <p style="font-size: 12px;">Reading: {{ b.book|truncatechars:20 }}</p>
+            </div>
+            <div style="text-align: right; display: flex; flex-direction: column; gap: 8px;">
+                <span class="status-pill {{ b.status }}">{{ b.status }}</span>
+                <button onclick="fetchHistory('{{ b.user }}')" style="background: none; border: none; color: var(--cyan); font-size: 11px; cursor: pointer; text-decoration: underline; padding: 0;">View History</button>
+            </div>
         </div>
         {% endif %}
-        {% empty %}
-        <p class="muted">No active borrowers.</p>
         {% endfor %}
-      </div>
     </div>
-  </div><!-- /members -->
-
+  </div>
 </main>
 
-<!-- ── Scripts ──────────────────────────────────────────────────────────── -->
 <script>
-  // ── Inject Django context ──────────────────────────────────────────────
-  const MONTHS   = {{ months_labels|safe }};
-  const BORROWED = {{ borrowed_counts|safe }};
-  const RETURNED = {{ returned_counts|safe }};
-  const G_LABELS = {{ genre_labels|safe }};
-  const G_COUNTS = {{ genre_counts|safe }};
-  const C_LABELS = {{ condition_labels|safe }};
-  const C_COUNTS = {{ condition_counts|safe }};
-
-  const GOLD   = '#e8c547';
-  const CYAN   = '#38c9f2';
-  const PURPLE = '#9b6dff';
-  const RED    = '#f87171';
-  const GREEN  = '#4ade80';
-  const ORANGE = '#f28c38';
-  const GENRE_COLORS = [GOLD, ORANGE, RED, PURPLE, CYAN, GREEN, '#a78bfa', '#fb7185'];
-
-  Chart.defaults.color = '#6b6660';
-  Chart.defaults.font.family = "'DM Sans', sans-serif";
-  Chart.defaults.font.size = 11;
-
-  const gridOpts = {
-    color: 'rgba(255,255,255,0.045)',
-    drawBorder: false,
-  };
-
-  // ── Trend area chart ───────────────────────────────────────────────────
-  new Chart(document.getElementById('trendChart'), {
-    type: 'line',
-    data: {
-      labels: MONTHS,
-      datasets: [
-        {
-          label: 'Borrowed',
-          data: BORROWED,
-          borderColor: GOLD,
-          borderWidth: 2,
-          backgroundColor: 'rgba(232,197,71,0.12)',
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: GOLD,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-        },
-        {
-          label: 'Returned',
-          data: RETURNED,
-          borderColor: CYAN,
-          borderWidth: 2,
-          backgroundColor: 'rgba(56,201,242,0.08)',
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: CYAN,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1814', borderColor: '#2e2b25', borderWidth: 1, padding: 10 } },
-      scales: {
-        x: { grid: gridOpts, ticks: { color: '#6b6660' } },
-        y: { grid: gridOpts, ticks: { color: '#6b6660' }, beginAtZero: true },
-      },
-    },
-  });
-
-  // ── Genre donut chart ──────────────────────────────────────────────────
-  new Chart(document.getElementById('donutChart'), {
-    type: 'doughnut',
-    data: {
-      labels: G_LABELS,
-      datasets: [{
-        data: G_COUNTS,
-        backgroundColor: GENRE_COLORS,
-        borderWidth: 2,
-        borderColor: '#0f0d0b',
-        hoverBorderColor: '#0f0d0b',
-      }],
-    },
-    options: {
-      cutout: '60%',
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: { backgroundColor: '#1a1814', borderColor: '#2e2b25', borderWidth: 1, padding: 10 },
-      },
-    },
-  });
-
-  // Build genre legend
-  const genreLegend = document.getElementById('genre-legend');
-  G_LABELS.forEach((lbl, i) => {
-    genreLegend.innerHTML += `
-      <div class="genre-row">
-        <div class="left">
-          <div class="dot-sq" style="background:${GENRE_COLORS[i % GENRE_COLORS.length]}"></div>
-          ${lbl}
-        </div>
-        <div class="right">${G_COUNTS[i]}</div>
-      </div>`;
-  });
-
-  // ── Condition horizontal bar ───────────────────────────────────────────
-  new Chart(document.getElementById('conditionChart'), {
-    type: 'bar',
-    data: {
-      labels: C_LABELS,
-      datasets: [{
-        label: 'Copies',
-        data: C_COUNTS,
-        backgroundColor: [GREEN, GOLD, ORANGE, RED],
-        borderRadius: 6,
-        borderSkipped: false,
-      }],
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1814', borderColor: '#2e2b25', borderWidth: 1, padding: 10 } },
-      scales: {
-        x: { grid: gridOpts, ticks: { color: '#6b6660' }, beginAtZero: true },
-        y: { grid: { display: false }, ticks: { color: '#b0aa9e' } },
-      },
-    },
-  });
-
-  // ── Genre bar chart (books tab) ────────────────────────────────────────
-  new Chart(document.getElementById('genreBarChart'), {
-    type: 'bar',
-    data: {
-      labels: G_LABELS,
-      datasets: [{
-        label: 'Books',
-        data: G_COUNTS,
-        backgroundColor: GENRE_COLORS,
-        borderRadius: 6,
-        borderSkipped: false,
-      }],
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1814', borderColor: '#2e2b25', borderWidth: 1, padding: 10 } },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: '#8a8580' } },
-        y: { grid: gridOpts, ticks: { color: '#6b6660' }, beginAtZero: true },
-      },
-    },
-  });
-
-  // ── Tab switching ──────────────────────────────────────────────────────
-  const titleMap = { overview: 'Dashboard', books: 'Books', borrowings: 'Borrowings', members: 'Members' };
+  // Tab Switching
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.tab;
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      if(!tab) return;
+      document.querySelectorAll('.nav-item, .tab-panel').forEach(el => el.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('tab-' + tab).classList.add('active');
-      document.getElementById('page-title').textContent = titleMap[tab];
+      document.getElementById('page-title').textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
     });
   });
 
-  // ── Live date ──────────────────────────────────────────────────────────
-  const d = new Date();
-  document.getElementById('js-date').textContent = d.toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  // Search Logic
+  document.getElementById('borrowSearch').addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#borrowTable tbody tr');
+    rows.forEach(row => {
+      row.style.display = row.innerText.toLowerCase().includes(filter) ? '' : 'none';
+    });
+  });
+
+  // AJAX Fetch History Function
+  function fetchHistory(username) {
+    const modal = document.getElementById('historyModal');
+    const list = document.getElementById('historyList');
+    const userTitle = document.getElementById('modalUser');
+    
+    userTitle.innerText = username + "'s History";
+    list.innerHTML = '<p style="color:var(--dim); font-size: 13px;">Loading history...</p>';
+    modal.style.display = 'flex';
+
+    fetch(`/member-history/${username}/`)
+      .then(response => response.json())
+      .then(data => {
+        list.innerHTML = '';
+        if (data.history.length === 0) {
+          list.innerHTML = '<p style="color:var(--dim); font-size: 13px; padding: 20px 0;">No past records found for this member.</p>';
+        } else {
+          data.history.forEach(item => {
+            const statusColor = item.status === 'Active' ? 'var(--cyan)' : 'var(--muted)';
+            list.innerHTML += `
+              <div class="history-item">
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">${item.book}</div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--dim);">
+                  <span>Borrowed on ${item.borrow_date}</span>
+                  <span style="color: ${statusColor}; font-weight: 700;">${item.status.toUpperCase()}</span>
+                </div>
+              </div>
+            `;
+          });
+        }
+      })
+      .catch(err => {
+        list.innerHTML = '<p style="color:var(--red); font-size: 13px;">Error loading data. Check URLs.</p>';
+      });
+  }
+
+  // Trend Chart
+  const trendCtx = document.getElementById('trendChart').getContext('2d');
+  new Chart(trendCtx, {
+    type: 'line',
+    data: {
+      labels: {{ months_labels|safe }},
+      datasets: [{ label: 'Borrowed', data: {{ borrowed_counts|safe }}, borderColor: '#e8c547', tension: 0.4, fill: true, backgroundColor: 'rgba(232,197,71,0.05)' }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.03)' } } } }
+  });
+
+  // Genre Bar Chart
+  const genreCtx = document.getElementById('genreBarChart').getContext('2d');
+  new Chart(genreCtx, {
+    type: 'bar',
+    data: {
+      labels: {{ genre_labels|safe }},
+      datasets: [{ data: {{ genre_counts|safe }}, backgroundColor: ['#e8c547', '#9b6dff', '#38c9f2', '#f87171', '#4ade80'], borderRadius: 8 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.03)' } } } }
   });
 </script>
 </body>

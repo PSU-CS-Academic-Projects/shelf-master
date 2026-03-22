@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h2 style="font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 800; color: #f0ede8;">Book Collection</h2>
+    <a href="{% url 'book:dashboard' %}" class="badge-user" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; color: #8a8580; text-decoration: none; font-size: 12px;">
+        ← Back to Dashboard
+    </a>
+</div>
+
+<div style="margin-bottom: 25px;">
+    <input type="text" id="bookSearchInput" placeholder="Quick search by title, author, or ISBN..." 
+           style="width: 100%; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.065); padding: 14px 20px; border-radius: 12px; color: #f0ede8; outline: none; transition: 0.3s; font-family: 'DM Sans', sans-serif;">
+</div>
+
+<div class="chart-card" style="background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.065); border-radius: 16px; padding: 24px;">
+    <table class="data-table" id="bookTable" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="color: #6b6660; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; text-align: left;">
+                <th style="padding-bottom: 15px;">Title</th>
+                <th style="padding-bottom: 15px;">ISBN</th>
+                <th style="padding-bottom: 15px;">Genre</th>
+                <th style="padding-bottom: 15px;">Author</th>
+            </tr>
+        </thead>
+        <tbody style="color: #d0cdc7; font-size: 14px;">
+            {% for object in object_list %}
+            <tr style="border-top: 1px solid rgba(255,255,255,0.04);">
+                <td style="padding: 15px 0; font-weight: 500; color: #e8c547;">{{ object.title }}</td>
+                <td style="padding: 15px 0; color: #8a8580;">{{ object.isbn }}</td>
+                <td style="padding: 15px 0;">
+                    <span class="status-badge active" style="background: rgba(56,201,242,0.1); color: #38c9f2; border: 1px solid rgba(56,201,242,0.2); padding: 3px 10px; border-radius: 20px; font-size: 10px;">
+                        {{ object.genre }}
+                    </span>
+                </td>
+                <td style="padding: 15px 0; color: #8a8580;">{{ object.author }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: #6b6660;">No books found in the database.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById('bookSearchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#bookTable tbody tr');
+
+        rows.forEach(row => {
+            // This grabs all the text in the row so you can search by any column
+            let text = row.innerText.toLowerCase();
+            if (text.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+
+    // Optional: Add a focus effect to the search bar
+    const searchInput = document.getElementById('bookSearchInput');
+    searchInput.addEventListener('focus', () => searchInput.style.borderColor = '#e8c547');
+    searchInput.addEventListener('blur', () => searchInput.style.borderColor = 'rgba(255,255,255,0.065)');
+</script>
+{% endblock %}
