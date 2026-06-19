@@ -25,42 +25,78 @@
         </thead>
         <tbody style="color: #d0cdc7; font-size: 14px;">
             {% for object in object_list %}
-            <tr style="border-top: 1px solid rgba(255,255,255,0.04);">
-                <td style="padding: 15px 0; font-weight: 500; color: #e8c547;">{{ object.title }}</td>
-                <td style="padding: 15px 0; color: #8a8580;">{{ object.isbn }}</td>
+            <tr class="book-row" 
+                style="border-top: 1px solid rgba(255,255,255,0.04);"
+                data-search-fallback="{{ object.title }} {{ object.isbn }} {{ object.genre }} {{ object.author }}">
+                
+                <td style="padding: 15px 0; font-weight: 500; color: #e8c547;">
+                    {{ object.title|default:"Untitled Book" }}
+                </td>
+                
+                <td style="padding: 15px 0; color: #8a8580;">
+                    {{ object.isbn|default:"N/A" }}
+                </td>
+                
                 <td style="padding: 15px 0;">
                     <span class="status-badge active" style="background: rgba(56,201,242,0.1); color: #38c9f2; border: 1px solid rgba(56,201,242,0.2); padding: 3px 10px; border-radius: 20px; font-size: 10px;">
-                        {{ object.genre }}
+                        {% if object.genre.name %}
+                            {{ object.genre.name }}
+                        {% elif object.genres.all %}
+                            {% for g in object.genres.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        {% else %}
+                            {{ object.genre|default:"General" }}
+                        {% endif %}
                     </span>
                 </td>
-                <td style="padding: 15px 0; color: #8a8580;">{{ object.author }}</td>
+                
+                <td style="padding: 15px 0; color: #8a8580;">
+                    {% if object.authors.all %}
+                        {% for author in object.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                    {% elif object.author.name %}
+                        {{ object.author.name }}
+                    {% else %}
+                        {{ object.author|default:"Unknown Author" }}
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
-            <tr>
+            <tr id="noBooksMatchRow">
                 <td colspan="4" style="text-align: center; padding: 40px; color: #6b6660;">No books found in the database.</td>
             </tr>
             {% endfor %}
+            
+            <tr id="noResultsFallback" style="display: none;">
+                <td colspan="4" style="text-align: center; padding: 40px; color: #6b6660;">No matches found for your search query.</td>
+            </tr>
         </tbody>
     </table>
 </div>
 
 <script>
     document.getElementById('bookSearchInput').addEventListener('keyup', function() {
-        let filter = this.value.toLowerCase();
-        let rows = document.querySelectorAll('#bookTable tbody tr');
+        let filter = this.value.toLowerCase().trim();
+        let rows = document.querySelectorAll('#bookTable tbody tr.book-row');
+        let fallbackRow = document.getElementById('noResultsFallback');
+        let visibleCount = 0;
 
         rows.forEach(row => {
-            // This grabs all the text in the row so you can search by any column
-            let text = row.innerText.toLowerCase();
-            if (text.includes(filter)) {
+            // Evaluates text within cells + hidden fallback dataset attributes
+            let text = row.textContent.toLowerCase();
+            let fallbackText = row.getAttribute('data-search-fallback').toLowerCase();
+            
+            if (text.includes(filter) || fallbackText.includes(filter)) {
                 row.style.display = "";
+                visibleCount++;
             } else {
                 row.style.display = "none";
             }
         });
+
+        if (fallbackRow) {
+            fallbackRow.style.display = (visibleCount === 0 && rows.length > 0) ? "" : "none";
+        }
     });
 
-    // Optional: Add a focus effect to the search bar
     const searchInput = document.getElementById('bookSearchInput');
     searchInput.addEventListener('focus', () => searchInput.style.borderColor = '#e8c547');
     searchInput.addEventListener('blur', () => searchInput.style.borderColor = 'rgba(255,255,255,0.065)');

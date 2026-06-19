@@ -17,35 +17,25 @@
       --red: #f87171; --green: #4ade80;
     }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
-    
-    /* Sidebar */
     .sidebar { position: fixed; width: 220px; height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 0; z-index: 100; }
     .sidebar-logo { padding: 0 24px 32px; }
     .sidebar-logo h1 { font-family: 'Syne'; font-size: 22px; line-height: 1.1; }
     .sidebar-nav { flex: 1; padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
     .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; font-size: 13px; color: var(--dim); text-decoration: none; border: none; background: none; width: 100%; cursor: pointer; transition: 0.2s; text-align: left; }
     .nav-item:hover, .nav-item.active { color: var(--gold); background: rgba(232,197,71,0.08); }
-
-    /* Main Content */
     .main { margin-left: 220px; padding: 40px; width: calc(100% - 220px); }
     .tab-panel { display: none; animation: fadeIn 0.4s ease forwards; }
     .tab-panel.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Stat Cards */
     .stat-grid { display: grid; gap: 20px; grid-template-columns: repeat(4, 1fr); margin-bottom: 30px; }
     .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 30px; position: relative; overflow: hidden; }
     .stat-card .accent-bar { position: absolute; top: 0; left: 0; width: 100%; height: 3px; }
     .stat-card h3 { font-family: 'Syne'; font-size: 48px; margin-bottom: 5px; }
     .stat-card p { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; color: var(--muted); }
-
-    /* Book Gallery Styling */
     .book-card { transition: all 0.3s ease; cursor: pointer; }
     .book-card:hover { transform: translateY(-8px); }
     .book-card:hover .cover-wrapper { border-color: var(--gold); box-shadow: 0 12px 24px rgba(0,0,0,0.5); }
     .cover-wrapper { width: 100%; aspect-ratio: 2/3; background: var(--surface2); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 12px; transition: 0.3s; position: relative; }
-
-    /* Table & UI Design */
     .search-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); padding: 14px 20px; border-radius: 12px; color: white; margin-bottom: 20px; outline: none; transition: 0.3s; }
     .search-input:focus { border-color: var(--gold); }
     .data-table { width: 100%; border-collapse: collapse; }
@@ -55,8 +45,6 @@
     .status-pill.active { background: rgba(74,222,128,0.1); color: var(--green); }
     .status-pill.overdue { background: rgba(248,113,113,0.1); color: var(--red); }
     .status-pill.returned { background: rgba(255,255,255,0.05); color: var(--muted); }
-
-    /* Members & Modal */
     .members-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
     .member-item-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 15px; }
     .avatar-circle { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
@@ -86,6 +74,15 @@
     <button class="nav-item" data-tab="borrowings">⇄ Borrowings</button>
     <button class="nav-item" data-tab="members">◎ Members</button>
   </nav>
+
+  <div style="padding: 0 12px; margin-top: auto;">
+    <form action="{% url 'logout' %}" method="post" style="width: 100%;">
+      {% csrf_token %}
+      <button type="submit" class="nav-item" style="color: var(--red); width: 100%;">
+        ✕ Log Out
+      </button>
+    </form>
+  </div>
 </aside>
 
 <main class="main">
@@ -191,19 +188,18 @@
 </main>
 
 <script>
-  // Tab Switching
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.tab;
       if(!tab) return;
       document.querySelectorAll('.nav-item, .tab-panel').forEach(el => el.classList.remove('active'));
       btn.classList.add('active');
-      document.getElementById('tab-' + tab).classList.add('active');
+      const targetPanel = document.getElementById('tab-' + tab);
+      if(targetPanel) targetPanel.classList.add('active');
       document.getElementById('page-title').textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
     });
   });
 
-  // Search Logic
   document.getElementById('borrowSearch').addEventListener('keyup', function() {
     let filter = this.value.toLowerCase();
     let rows = document.querySelectorAll('#borrowTable tbody tr');
@@ -212,7 +208,6 @@
     });
   });
 
-  // AJAX Fetch History Function
   function fetchHistory(username) {
     const modal = document.getElementById('historyModal');
     const list = document.getElementById('historyList');
@@ -248,7 +243,6 @@
       });
   }
 
-  // Trend Chart
   const trendCtx = document.getElementById('trendChart').getContext('2d');
   new Chart(trendCtx, {
     type: 'line',
@@ -259,7 +253,6 @@
     options: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.03)' } } } }
   });
 
-  // Genre Bar Chart
   const genreCtx = document.getElementById('genreBarChart').getContext('2d');
   new Chart(genreCtx, {
     type: 'bar',

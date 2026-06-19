@@ -14,7 +14,6 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
-    # Updated to use the actual fields from your models.py
     list_display = ("book", "inventory_number", "condition", "is_available", "added_date")
     list_filter = ("condition", "is_available")
 
@@ -24,5 +23,4 @@ class BorrowingAdmin(admin.ModelAdmin):
     list_filter = ("is_returned", "due_date")
     search_fields = ("borrower__username", "book_instance__book__title")
     
-# Register Genre normally since it has no custom admin class yet
 admin.site.register(Genre)

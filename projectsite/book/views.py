@@ -10,12 +10,10 @@ import json
 from django.views.generic import ListView
 from .models import Author, Genre, Book, BookInstance, Borrowing
 
-# --- DASHBOARD VIEW ---
 @login_required
 def dashboard(request):
     today = date.today()
     
-    # NEW: Fetch all books to display in the cover gallery
     all_books = Book.objects.all().order_by('title')
 
     total_books = Book.objects.count()
@@ -27,7 +25,6 @@ def dashboard(request):
     active_borrowings = Borrowing.objects.filter(is_returned=False).count()
     overdue_borrowings = Borrowing.objects.filter(is_returned=False, due_date__lt=today).count()
 
-    # Trend Logic (6 Months)
     months_labels, borrowed_counts, returned_counts = [], [], []
     for i in range(5, -1, -1):
         month_start = (today.replace(day=1) - timedelta(days=i * 30)).replace(day=1)
@@ -43,16 +40,13 @@ def dashboard(request):
         borrowed_counts.append(borrowed)
         returned_counts.append(returned)
 
-    # Genre Distribution
     genre_qs = Genre.objects.annotate(book_count=Count('books')).order_by('-book_count')[:8]
     
-    # Condition Data
     condition_qs = BookInstance.objects.values('condition').annotate(count=Count('id'))
     condition_map = {c['condition']: c['count'] for c in condition_qs}
     condition_labels = ['Excellent', 'Good', 'Fair', 'Damaged']
     condition_counts = [condition_map.get(k.lower(), 0) for k in condition_labels]
 
-    # Recent Activity
     recent_borrowings = Borrowing.objects.select_related('borrower', 'book_instance', 'book_instance__book').order_by('-borrow_date')
     borrowings_data = []
     for b in recent_borrowings:
@@ -68,7 +62,7 @@ def dashboard(request):
     avail_pct = round((available_copies / total_copies * 100) if total_copies else 0)
     
     context = {
-        'all_books': all_books, # ADDED THIS
+        'all_books': all_books, 
         'total_books': total_books, 'total_copies': total_copies, 'available_copies': available_copies,
         'avail_pct': avail_pct, 'total_authors': total_authors, 'total_genres': total_genres,
         'total_members': total_members, 'active_borrowings': active_borrowings, 'overdue_borrowings': overdue_borrowings,
@@ -79,7 +73,6 @@ def dashboard(request):
     }
     return render(request, 'Book/dashboard.html', context)
 
-# --- NEW: MEMBER HISTORY FETCH ---
 @login_required
 def member_history(request, username):
     history = Borrowing.objects.filter(borrower__username=username).select_related('book_instance__book').order_by('-borrow_date')
