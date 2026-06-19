@@ -5,7 +5,7 @@
 ## Project Category
  Web Systems
 
-## Members:
+### Members:
  * Vincent Mago
  * John Carlo Dagoy
  * Mark Jayson Galarpe
@@ -59,7 +59,7 @@
 
  - access dashboard after loggin in
 
-## Video Demo
+### Video Demo
  https://drive.google.com/drive/folders/1koy0HBHjiX0gYPEnScj5W7YxiISHcJJb?usp=sharing
 
 ## Screenshots
