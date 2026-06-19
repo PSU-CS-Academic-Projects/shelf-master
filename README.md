@@ -62,27 +62,27 @@
 ### Video Demo
  https://drive.google.com/drive/folders/1koy0HBHjiX0gYPEnScj5W7YxiISHcJJb?usp=sharing
 
-## Screenshots
+### Screenshots
 
-#### Login Page
+## Login Page
 ![Login Page](screenshots/login.png)
 
-#### Dashboard Overview
+## Dashboard Overview
 ![Dashboard Overview](screenshots/overview.png)
 
-#### Books Collection
+## Books Collection
 ![Books Collection](screenshots/books.png)
 
-#### Book Management Panel
+## Book Management Panel
 ![Book Management Panel](screenshots/book%20management.png)
 
-#### Borrowings Log
+## Borrowings Log
 ![Borrowings Log](screenshots/borrowings.png)
 
-#### Members Directory
+## Members Directory
 ![Members Directory](screenshots/members.png)
 
-#### Member Profile Example
+## Member Profile Example
 ![Member Profile Example](screenshots/member%20example.png)
 
 ## Future Improvements
