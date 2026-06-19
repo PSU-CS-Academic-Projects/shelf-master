@@ -51,7 +51,15 @@
  - run missing core database migrations if applicable
   python manage.py migrate
 
+ - Create a Superuser account for you to log in
+  python manage.py createsuperuser
+
  - run server
  python manage.py runserver 8080
 
  - access dashboard after loggin in
+
+## Video Demo
+ https://drive.google.com/drive/folders/1koy0HBHjiX0gYPEnScj5W7YxiISHcJJb?usp=sharing
+
+ 
