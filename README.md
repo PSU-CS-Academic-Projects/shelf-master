@@ -10,6 +10,9 @@
  * John Carlo Dagoy
  * Mark Jayson Galarpe
 
+## Academic Year
+ 2025-2026
+
 ## Instructor
  Ma'am Divine Caabay
 
@@ -52,4 +55,3 @@
  python manage.py runserver 8080
 
  - access dashboard after loggin in
- 
