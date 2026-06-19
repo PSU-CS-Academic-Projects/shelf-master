@@ -5,7 +5,7 @@
 ## Project Category
  Web Systems
 
-### Members:
+### Members
  * Vincent Mago
  * John Carlo Dagoy
  * Mark Jayson Galarpe
